@@ -111,4 +111,16 @@ private extension MainViewController {
 }
 
 // MARK: - UICollectionViewDelegate
-extension MainViewController: UICollectionViewDelegate {}
+extension MainViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let section = collectionViewDataSource.section(at: indexPath.section) else { return }
+        
+        switch section.type {
+        case .loader:
+            return
+        case .horizontalList:
+            let item = section.items[indexPath.item]
+            presenter.itemTapped(item)
+        }
+    }
+}

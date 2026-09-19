@@ -7,8 +7,15 @@
 
 import Foundation
 
+enum MainPresenterOutputAction {
+    case showAdvert(id: Int)
+}
+
+typealias MainPresenterOutput = (MainPresenterOutputAction) -> Void
+
 final class MainPresenter: MainViewOutputProtocol {
     weak var view: MainListViewInputProtocol?
+    var output: MainPresenterOutput?
     
     private var viewData = MainViewData(sections: [])
     
@@ -32,6 +39,14 @@ final class MainPresenter: MainViewOutputProtocol {
 //                view?.showAlert(title: "Ошибка", message: "Ошибка загрузки: \(error)")
             }
         }
+    }
+    
+    func itemTapped(_ item: ListSectionData.Item) {
+        guard case let .horizontalItemCell(cellData) = item else {
+            return
+        }
+
+        output?(.showAdvert(id: cellData.id))
     }
     
     func loadMoreIfNeeded(with item: ListSectionData.Item) {}

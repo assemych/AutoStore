@@ -12,6 +12,7 @@ protocol MainViewOutputProtocol: AnyObject {
 
     func viewDidLoad()
     func loadMoreIfNeeded(with item: ListSectionData.Item)
+    func itemTapped(_ item: ListSectionData.Item)
 }
 
 protocol MainListViewInputProtocol: AnyObject {

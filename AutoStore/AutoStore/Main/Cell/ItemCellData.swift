@@ -10,6 +10,7 @@ import Foundation
 nonisolated
 struct ItemCellData: Hashable {
     let uuid = UUID()
+    let id: Int
     let title: String
     let imageUrl: URL?
     

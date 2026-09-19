@@ -30,7 +30,9 @@ private extension TabBarController {
                 )
                 let vc = MainViewController(presenter: presenter)
                 presenter.view = vc
-                
+                presenter.output = { [weak self] action in
+                    self?.handle(action)
+                }
                 return UINavigationController(rootViewController: vc)
             case .dealers:
                 return UINavigationController(rootViewController: UIViewController())
@@ -42,6 +44,22 @@ private extension TabBarController {
             $1.tabBarItem.image = UIImage(systemName: dataSource[$0].iconName)
             $1.tabBarItem.imageInsets = UIEdgeInsets(top: 5, left: .zero, bottom: -5, right: .zero)
         }
+    }
+    
+    private func handle(_ action: MainPresenterOutputAction) {
+        switch action {
+        case let .showAdvert(id):
+            openAdvertDetail(id: id)
+        }
+    }
+
+    private func openAdvertDetail(id: Int) {
+        guard let navigationController = selectedViewController as? UINavigationController else {
+            return
+        }
+
+        let viewController = AdvertDetailModuleFactory.make(advertID: id)
+        navigationController.pushViewController(viewController, animated: true)
     }
 }
 

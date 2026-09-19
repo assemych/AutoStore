@@ -21,7 +21,7 @@ final class MainViewDataFactory: MainViewDataFactoryProtocol {
     
     private func createItems(from cars: [CarResponse]) -> [ListSectionData.Item] {
         let items: [ListSectionData.Item] = cars.map {
-            .horizontalItemCell(.init(title: $0.name, imageUrl: URL(string: $0.imageUrl)))
+            .horizontalItemCell(.init(id: $0.id, title: $0.name, imageUrl: URL(string: $0.imageUrl)))
         }
         
         return items
