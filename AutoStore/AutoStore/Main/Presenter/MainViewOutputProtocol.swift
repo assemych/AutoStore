@@ -7,14 +7,18 @@
 
 import Foundation
 
+@MainActor
 protocol MainViewOutputProtocol: AnyObject {
     var view: MainListViewInputProtocol? { get set }
 
     func viewDidLoad()
+    func retry()
+    func viewDidDisappear()
     func loadMoreIfNeeded(with item: ListSectionData.Item)
     func itemTapped(_ item: ListSectionData.Item)
 }
 
+@MainActor
 protocol MainListViewInputProtocol: AnyObject {
-    func reloadData(with viewData: MainViewData)
+    func render(state: MainViewState)
 }

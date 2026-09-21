@@ -56,22 +56,22 @@ final class CarService: CarServiceProtocol {
                 imageUrl: "https://www.new-energy-vehicles.ru/uploads/40938/geely-coolray-2024-1-5t-dct-longteng-editione655a.jpg"
             ),
             CarResponse(
-                id: 6,
+                id: 7,
                 name: "Geely Coolray 7",
                 imageUrl: "https://strg1.nm.kz/neofiles/serve-image/64b504705e89410007559de0/1190x500/q90"
             ),
             CarResponse(
-                id: 7,
+                id: 8,
                 name: "Geely Coolray 8",
                 imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSt-zdD-aU-cl9reRPbCl5a3K3YzX1ObsmJlg&s"
             ),
             CarResponse(
-                id: 7,
+                id: 9,
                 name:  "Geely Coolray 9",
                 imageUrl: "https://www.new-energy-vehicles.ru/uploads/40938/geely-coolray-2024-1-5t-dct-longteng-editione655a.jpg"
             ),
             CarResponse(
-                id: 7,
+                id: 10,
                 name: "Geely Coolray 10",
                 imageUrl: "https://strg1.nm.kz/neofiles/serve-image/64b504705e89410007559de0/1190x500/q90"
             )
@@ -81,52 +81,52 @@ final class CarService: CarServiceProtocol {
     private func fetchCarsPage2() -> [CarResponse] {
         [
             CarResponse(
-                id: 8,
+                id: 11,
                 name: "Geely Coolray 11",
                 imageUrl: "https://strg1.nm.kz/neofiles/serve-image/64b504705e89410007559de0/1190x500/q90"
             ),
             CarResponse(
-                id: 8,
+                id: 12,
                 name: "Geely Coolray 12",
                 imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSt-zdD-aU-cl9reRPbCl5a3K3YzX1ObsmJlg&s"
             ),
             CarResponse(
-                id: 9,
+                id: 13,
                 name:  "Geely Coolray 13",
                 imageUrl: "https://www.new-energy-vehicles.ru/uploads/40938/geely-coolray-2024-1-5t-dct-longteng-editione655a.jpg"
             ),
             CarResponse(
-                id: 9,
+                id: 14,
                 name:  "Geely Coolray 14",
                 imageUrl: "https://strg1.nm.kz/neofiles/serve-image/64b504705e89410007559de0/1190x500/q90"
             ),
             CarResponse(
-                id: 10,
+                id: 15,
                 name:  "Geely Coolray 15",
                 imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSt-zdD-aU-cl9reRPbCl5a3K3YzX1ObsmJlg&s"
             ),
             CarResponse(
-                id: 11,
+                id: 16,
                 name: "Geely Coolray 16",
                 imageUrl: "https://www.new-energy-vehicles.ru/uploads/40938/geely-coolray-2024-1-5t-dct-longteng-editione655a.jpg"
             ),
             CarResponse(
-                id: 12,
+                id: 17,
                 name: "Geely Coolray 17",
                 imageUrl: "https://strg1.nm.kz/neofiles/serve-image/64b504705e89410007559de0/1190x500/q90"
             ),
             CarResponse(
-                id: 13,
+                id: 18,
                 name: "Geely Coolray 18",
                 imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSt-zdD-aU-cl9reRPbCl5a3K3YzX1ObsmJlg&s"
             ),
             CarResponse(
-                id: 14,
+                id: 19,
                 name: "Geely Coolray 19",
                 imageUrl: "https://www.new-energy-vehicles.ru/uploads/40938/geely-coolray-2024-1-5t-dct-longteng-editione655a.jpg"
             ),
             CarResponse(
-                id: 15,
+                id: 20,
                 name: "Geely Coolray 20",
                 imageUrl: "https://strg1.nm.kz/neofiles/serve-image/64b504705e89410007559de0/1190x500/q90"
             )
@@ -136,52 +136,52 @@ final class CarService: CarServiceProtocol {
     private func fetchCarsPage3() -> [CarResponse] {
         [
             CarResponse(
-                id: 16,
+                id: 21,
                 name: "Geely Coolray 11",
                 imageUrl: "https://strg1.nm.kz/neofiles/serve-image/64b504705e89410007559de0/1190x500/q90"
             ),
             CarResponse(
-                id: 17,
+                id: 22,
                 name: "Geely Coolray 12",
                 imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSt-zdD-aU-cl9reRPbCl5a3K3YzX1ObsmJlg&s"
             ),
             CarResponse(
-                id: 18,
+                id: 23,
                 name:  "Geely Coolray 13",
                 imageUrl: "https://www.new-energy-vehicles.ru/uploads/40938/geely-coolray-2024-1-5t-dct-longteng-editione655a.jpg"
             ),
             CarResponse(
-                id: 19,
+                id: 24,
                 name:  "Geely Coolray 14",
                 imageUrl: "https://strg1.nm.kz/neofiles/serve-image/64b504705e89410007559de0/1190x500/q90"
             ),
             CarResponse(
-                id: 20,
+                id: 25,
                 name:  "Geely Coolray 15",
                 imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSt-zdD-aU-cl9reRPbCl5a3K3YzX1ObsmJlg&s"
             ),
             CarResponse(
-                id: 21,
+                id: 26,
                 name: "Geely Coolray 16",
                 imageUrl: "https://www.new-energy-vehicles.ru/uploads/40938/geely-coolray-2024-1-5t-dct-longteng-editione655a.jpg"
             ),
             CarResponse(
-                id: 22,
+                id: 27,
                 name: "Geely Coolray 17",
                 imageUrl: "https://strg1.nm.kz/neofiles/serve-image/64b504705e89410007559de0/1190x500/q90"
             ),
             CarResponse(
-                id: 23,
+                id: 28,
                 name: "Geely Coolray 18",
                 imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSt-zdD-aU-cl9reRPbCl5a3K3YzX1ObsmJlg&s"
             ),
             CarResponse(
-                id: 24,
+                id: 29,
                 name: "Geely Coolray 19",
                 imageUrl: "https://www.new-energy-vehicles.ru/uploads/40938/geely-coolray-2024-1-5t-dct-longteng-editione655a.jpg"
             ),
             CarResponse(
-                id: 25,
+                id: 30,
                 name: "Geely Coolray 20",
                 imageUrl: "https://strg1.nm.kz/neofiles/serve-image/64b504705e89410007559de0/1190x500/q90"
             )

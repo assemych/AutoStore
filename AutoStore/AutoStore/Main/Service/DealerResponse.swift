@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct DealerResponse: Codable {
+struct DealerResponse: Codable, Sendable {
     let id: Int
     let name: String
     let cars: [CarResponse]

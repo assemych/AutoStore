@@ -18,9 +18,23 @@ final class MainViewController: UIViewController {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.showsVerticalScrollIndicator = false
         collectionView.showsHorizontalScrollIndicator = false
-        collectionView.backgroundColor = .darkGray
+        collectionView.backgroundColor = .systemBackground
         
         return collectionView
+    }()
+
+    private let activityIndicator = UIActivityIndicatorView(style: .large)
+    private let stateLabel: UILabel = {
+        let label = UILabel()
+        label.numberOfLines = 0
+        label.textAlignment = .center
+        label.textColor = .secondaryLabel
+        return label
+    }()
+    private let retryButton: UIButton = {
+        var configuration = UIButton.Configuration.filled()
+        configuration.title = "Повторить"
+        return UIButton(configuration: configuration)
     }()
     
     private let presenter: MainViewOutputProtocol
@@ -38,17 +52,43 @@ final class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .darkGray
+        view.backgroundColor = .systemBackground
         setupSubviews()
         setupConstraints()
         setupCollectionView()
         presenter.viewDidLoad()
     }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        presenter.viewDidDisappear()
+    }
 }
 
 extension MainViewController: MainListViewInputProtocol {
-    func reloadData(with viewData: MainViewData) {
-        collectionViewDataSource.update(with: viewData)
+    func render(state: MainViewState) {
+        activityIndicator.stopAnimating()
+        collectionView.isHidden = true
+        stateLabel.isHidden = true
+        retryButton.isHidden = true
+
+        switch state {
+        case .loading:
+            collectionViewDataSource.clear()
+            activityIndicator.startAnimating()
+        case let .content(viewData):
+            collectionView.isHidden = false
+            collectionViewDataSource.update(with: viewData)
+        case let .empty(message):
+            collectionViewDataSource.clear()
+            stateLabel.text = message
+            stateLabel.isHidden = false
+        case let .error(message):
+            collectionViewDataSource.clear()
+            stateLabel.text = message
+            stateLabel.isHidden = false
+            retryButton.isHidden = false
+        }
     }
 }
 
@@ -56,15 +96,30 @@ extension MainViewController: MainListViewInputProtocol {
 private extension MainViewController {
     private func setupSubviews() {
         view.addSubview(collectionView)
+        view.addSubview(activityIndicator)
+        view.addSubview(stateLabel)
+        view.addSubview(retryButton)
+        retryButton.addTarget(self, action: #selector(retryTapped), for: .touchUpInside)
     }
+    
     private func setupConstraints() {
         collectionView.snp.makeConstraints { make in
-            make.top.equalToSuperview()
+            make.top.equalTo(view.safeAreaLayoutGuide)
             make.leading.trailing.equalToSuperview().inset(8)
             make.bottom.equalToSuperview()
 
         }
+        activityIndicator.snp.makeConstraints { $0.center.equalToSuperview() }
+        stateLabel.snp.makeConstraints {
+            $0.centerY.equalToSuperview().offset(-24)
+            $0.leading.trailing.equalToSuperview().inset(32)
+        }
+        retryButton.snp.makeConstraints {
+            $0.top.equalTo(stateLabel.snp.bottom).offset(16)
+            $0.centerX.equalToSuperview()
+        }
     }
+    
     private func setupCollectionView() {
         collectionView.delegate = self
         collectionView.collectionViewLayout = createCollectionLayout()
@@ -107,6 +162,10 @@ private extension MainViewController {
                 return nil
             }
         }
+    }
+
+    @objc private func retryTapped() {
+        presenter.retry()
     }
 }
 

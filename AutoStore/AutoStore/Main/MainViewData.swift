@@ -16,3 +16,10 @@ enum MainSectionType: Sendable, Hashable {
 struct MainViewData: Hashable {
     let sections: [ListSectionData]
 }
+
+enum MainViewState {
+    case loading
+    case content(MainViewData)
+    case empty(message: String)
+    case error(message: String)
+}

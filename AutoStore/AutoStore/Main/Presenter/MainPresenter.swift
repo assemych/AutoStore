@@ -13,41 +13,64 @@ enum MainPresenterOutputAction {
 
 typealias MainPresenterOutput = (MainPresenterOutputAction) -> Void
 
+@MainActor
 final class MainPresenter: MainViewOutputProtocol {
     weak var view: MainListViewInputProtocol?
     var output: MainPresenterOutput?
-    
-    private var viewData = MainViewData(sections: [])
-    
+
     private let service: CarServiceProtocol
     private let viewDataFactory: MainViewDataFactoryProtocol
-    
+    private var loadTask: Task<Void, Never>?
+
     init(service: CarServiceProtocol, viewDataFactory: MainViewDataFactoryProtocol) {
         self.service = service
         self.viewDataFactory = viewDataFactory
     }
 
     func viewDidLoad() {
-        Task {
+        loadContent()
+    }
+
+    func retry() {
+        loadContent()
+    }
+
+    func viewDidDisappear() {
+        loadTask?.cancel()
+        loadTask = nil
+    }
+
+    func itemTapped(_ item: ListSectionData.Item) {
+        guard case let .horizontalItemCell(cellData) = item.content else { return }
+        
+        output?(.showAdvert(id: cellData.advertID))
+    }
+
+    func loadMoreIfNeeded(with item: ListSectionData.Item) {}
+
+    private func loadContent() {
+        loadTask?.cancel()
+        view?.render(state: .loading)
+
+        loadTask = Task { [weak self] in
+            guard let self else { return }
+
             do {
-                let fetchedDealers = try await service.fetchDealers()
-                viewData = viewDataFactory.createViewData(with: fetchedDealers)
+                let dealers = try await service.fetchDealers()
+                try Task.checkCancellation()
                 
-                view?.reloadData(with: viewData)
+                let viewData = viewDataFactory.createViewData(with: dealers)
+                
+                if viewData.sections.isEmpty {
+                    view?.render(state: .empty(message: "Автомобили пока не найдены"))
+                } else {
+                    view?.render(state: .content(viewData))
+                }
+            } catch is CancellationError {
+                return
             } catch {
-                // показ ошибки
-//                view?.showAlert(title: "Ошибка", message: "Ошибка загрузки: \(error)")
+                view?.render(state: .error(message: "Не удалось загрузить автомобили"))
             }
         }
     }
-    
-    func itemTapped(_ item: ListSectionData.Item) {
-        guard case let .horizontalItemCell(cellData) = item else {
-            return
-        }
-
-        output?(.showAdvert(id: cellData.id))
-    }
-    
-    func loadMoreIfNeeded(with item: ListSectionData.Item) {}
 }

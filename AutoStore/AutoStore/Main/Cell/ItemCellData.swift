@@ -7,20 +7,8 @@
 
 import Foundation
 
-nonisolated
-struct ItemCellData: Hashable {
-    let uuid = UUID()
-    let id: Int
+nonisolated struct ItemCellData: Sendable {
+    let advertID: Int
     let title: String
     let imageUrl: URL?
-    
-    
-    // MARK: - Hashable
-    static func == (lhs: ItemCellData, rhs: ItemCellData) -> Bool {
-        lhs.uuid == rhs.uuid
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(uuid)
-    }
 }

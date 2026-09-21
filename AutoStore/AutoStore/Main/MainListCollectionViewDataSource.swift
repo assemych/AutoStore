@@ -12,7 +12,7 @@ final class MainListCollectionViewDataSource: UICollectionViewDiffableDataSource
 
     init(collectionView: UICollectionView) {
         super.init(collectionView: collectionView) { collectionView, indexPath, item in
-            switch item {
+            switch item.content {
             case let .loaderCell(cellData):
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "LoaderCell", for: indexPath) as! LoaderCell
                 cell.configure(with: cellData)
@@ -66,11 +66,15 @@ final class MainListCollectionViewDataSource: UICollectionViewDiffableDataSource
         let sections = viewData.sections
         
         var snapshot = Snapshot()
-        snapshot.appendSections(sections.map { $0 })
+        snapshot.appendSections(sections)
         sections.forEach { section in
             snapshot.appendItems(section.items, toSection: section)
         }
-        apply(snapshot, animatingDifferences: true)
+        apply(snapshot, animatingDifferences: false)
+    }
+
+    func clear() {
+        apply(Snapshot(), animatingDifferences: false)
     }
     
     func section(at index: Int) -> ListSectionData? {
@@ -89,4 +93,3 @@ final class MainListCollectionViewDataSource: UICollectionViewDiffableDataSource
         )
     }
 }
-

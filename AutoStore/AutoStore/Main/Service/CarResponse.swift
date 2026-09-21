@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct CarResponse: Codable {
+struct CarResponse: Codable, Sendable {
     let id: Int
     let name: String
     let imageUrl: String
