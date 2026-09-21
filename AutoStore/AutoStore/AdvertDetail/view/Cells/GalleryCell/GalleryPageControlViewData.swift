@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct GalleryPageControlViewData: Hashable {
+nonisolated struct GalleryPageControlViewData: Sendable, Hashable {
     let numberOfPages: Int
     let currentPage: Int
 }

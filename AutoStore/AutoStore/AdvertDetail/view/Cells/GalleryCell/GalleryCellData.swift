@@ -7,25 +7,6 @@
 
 import Foundation
 
-struct GalleryCellData: Hashable {
-    let uuid: UUID
+nonisolated struct GalleryCellData: Sendable {
     let imageURL: URL
-    
-    // MARK: - Initializer
-    init(
-        uuid: UUID = UUID(),
-        imageURL: URL
-    ) {
-        self.uuid = uuid
-        self.imageURL = imageURL
-    }
-    
-    // MARK: - Hashable
-    static func == (lhs: GalleryCellData, rhs: GalleryCellData) -> Bool {
-        lhs.uuid == rhs.uuid
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(uuid)
-    }
 }

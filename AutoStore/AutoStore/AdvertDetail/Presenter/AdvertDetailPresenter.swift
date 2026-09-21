@@ -1,10 +1,3 @@
-//
-//  AdvertDetailPresenter.swift
-//  AutoStore
-//
-//  Created by Assem Mukhamadi on 18.09.2026.
-//
-
 import Foundation
 
 @MainActor
@@ -12,38 +5,58 @@ protocol AdvertDetailOutputProtocol: AnyObject {
     var view: AdvertDetailViewInputProtocol? { get set }
 
     func viewDidLoad()
+    func retry()
+    func viewDidDisappear()
 }
 
 @MainActor
 final class AdvertDetailPresenter: AdvertDetailOutputProtocol {
     weak var view: AdvertDetailViewInputProtocol?
+
     private let advertID: Int
-    private let advertService: AdvertServiceProtocol
+    private let repository: AdvertRepositoryProtocol
+    private let viewDataFactory: AdvertDetailViewDataFactoryProtocol
+    private var loadTask: Task<Void, Never>?
 
     init(
         advertID: Int,
-        advertService: AdvertServiceProtocol
+        repository: AdvertRepositoryProtocol,
+        viewDataFactory: AdvertDetailViewDataFactoryProtocol
     ) {
         self.advertID = advertID
-        self.advertService = advertService
+        self.repository = repository
+        self.viewDataFactory = viewDataFactory
     }
 
     func viewDidLoad() {
-        Task {
-            do {
-                let advert = try await advertService.fetchAdvert(id: advertID)
-                let galeryItems = advert.imageURLs.map { AdvertDetailSection.ItemType.galery(.init(imageURL: $0)) }
-                let viewData = AdvertDetailViewData(
-                    sections: [.init(
-                        type: .galery,
-                        footerType: .gallery(.init(numberOfPages: advert.imageURLs.count, currentPage: 0)),
-                        items: galeryItems
-                    )]
-                )
+        loadAdvert()
+    }
 
-                view?.update(with: viewData)
+    func retry() {
+        loadAdvert()
+    }
+
+    func viewDidDisappear() {
+        loadTask?.cancel()
+        loadTask = nil
+    }
+
+    private func loadAdvert() {
+        loadTask?.cancel()
+        view?.render(state: .loading)
+
+        loadTask = Task { [weak self] in
+            guard let self else { return }
+
+            do {
+                let advert = try await repository.fetchAdvert(id: advertID)
+                try Task.checkCancellation()
+                let viewData = viewDataFactory.makeViewData(from: advert)
+                view?.render(state: .content(viewData))
+            } catch is CancellationError {
+                return
             } catch {
-//                view?.showError()
+                view?.render(state: .error(message: "Не удалось загрузить объявление"))
             }
         }
     }

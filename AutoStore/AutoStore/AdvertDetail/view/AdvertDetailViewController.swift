@@ -11,7 +11,7 @@ import SnapKit
 
 @MainActor
 protocol AdvertDetailViewInputProtocol: AnyObject {
-    func update(with viewData: AdvertDetailViewData)
+    func render(state: AdvertDetailViewState)
 }
 
 final class AdvertDetailViewController: UIViewController, AdvertDetailViewInputProtocol {
@@ -25,9 +25,23 @@ final class AdvertDetailViewController: UIViewController, AdvertDetailViewInputP
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.showsVerticalScrollIndicator = false
         collectionView.showsHorizontalScrollIndicator = false
-        collectionView.backgroundColor = .darkGray
+        collectionView.backgroundColor = .systemBackground
         
         return collectionView
+    }()
+
+    private let activityIndicator = UIActivityIndicatorView(style: .large)
+    private let stateLabel: UILabel = {
+        let label = UILabel()
+        label.numberOfLines = 0
+        label.textAlignment = .center
+        label.textColor = .secondaryLabel
+        return label
+    }()
+    private let retryButton: UIButton = {
+        var configuration = UIButton.Configuration.filled()
+        configuration.title = "Повторить"
+        return UIButton(configuration: configuration)
     }()
     
     private let collectionViewFactory: AdvertDetailCollectionViewLayoutFactoryProtocol
@@ -53,15 +67,41 @@ final class AdvertDetailViewController: UIViewController, AdvertDetailViewInputP
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .darkGray
+        view.backgroundColor = .systemBackground
         setupSubviews()
         setupConstraints()
         setupCollectionView()
         presenter.viewDidLoad()
     }
-    
-    func update(with viewData: AdvertDetailViewData) {
-        collectionViewDataSource.update(with: viewData)
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        presenter.viewDidDisappear()
+    }
+
+    func render(state: AdvertDetailViewState) {
+        activityIndicator.stopAnimating()
+        collectionView.isHidden = true
+        stateLabel.isHidden = true
+        retryButton.isHidden = true
+
+        switch state {
+        case .loading:
+            collectionViewDataSource.clear()
+            activityIndicator.startAnimating()
+        case let .content(viewData):
+            collectionView.isHidden = false
+            collectionViewDataSource.update(with: viewData)
+        case let .empty(message):
+            collectionViewDataSource.clear()
+            stateLabel.text = message
+            stateLabel.isHidden = false
+        case let .error(message):
+            collectionViewDataSource.clear()
+            stateLabel.text = message
+            stateLabel.isHidden = false
+            retryButton.isHidden = false
+        }
     }
 }
 
@@ -69,13 +109,25 @@ final class AdvertDetailViewController: UIViewController, AdvertDetailViewInputP
 private extension AdvertDetailViewController {
     private func setupSubviews() {
         view.addSubview(collectionView)
+        view.addSubview(activityIndicator)
+        view.addSubview(stateLabel)
+        view.addSubview(retryButton)
+        retryButton.addTarget(self, action: #selector(retryTapped), for: .touchUpInside)
     }
     private func setupConstraints() {
         collectionView.snp.makeConstraints { make in
-            make.top.equalToSuperview()
+            make.top.equalTo(view.safeAreaLayoutGuide)
             make.leading.trailing.equalToSuperview().inset(8)
             make.bottom.equalToSuperview()
-            
+        }
+        activityIndicator.snp.makeConstraints { $0.center.equalToSuperview() }
+        stateLabel.snp.makeConstraints {
+            $0.centerY.equalToSuperview().offset(-24)
+            $0.leading.trailing.equalToSuperview().inset(32)
+        }
+        retryButton.snp.makeConstraints {
+            $0.top.equalTo(stateLabel.snp.bottom).offset(16)
+            $0.centerX.equalToSuperview()
         }
     }
     private func setupCollectionView() {
@@ -91,27 +143,31 @@ private extension AdvertDetailViewController {
                 return nil
             }
             
-            switch section.type {
-            case .galery:
+            switch section.id {
+            case .gallery:
                 return self?.collectionViewFactory.makeGallerySection(environment: environment) { [weak self] page in
                     guard let self else { return }
                     
                     supplementaryViewUpdater.update(.galleryPage(page), in: collectionView)
                 }
             case .title:
-                return nil
-            case .charecteristic:
-                return nil
+                return self?.collectionViewFactory.makeContentSection(estimatedHeight: 92)
+            case .characteristics:
+                return self?.collectionViewFactory.makeContentSection(estimatedHeight: 72)
             case .buyButton:
-                return nil
+                return self?.collectionViewFactory.makeContentSection(estimatedHeight: 52)
             case .reviews:
-                return nil
+                return self?.collectionViewFactory.makeContentSection(estimatedHeight: 88)
             case .recommendations:
-                return nil
-            case .dealers:
-                return nil
+                return self?.collectionViewFactory.makeContentSection(estimatedHeight: 80)
+            case .dealer:
+                return self?.collectionViewFactory.makeContentSection(estimatedHeight: 80)
             }
         }
+    }
+
+    @objc private func retryTapped() {
+        presenter.retry()
     }
 }
 

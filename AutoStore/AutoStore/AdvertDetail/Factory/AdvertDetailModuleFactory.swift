@@ -12,7 +12,11 @@ enum AdvertDetailModuleFactory {
     static func make(advertID: Int) -> UIViewController {
         let presenter = AdvertDetailPresenter(
             advertID: advertID,
-            advertService: AdvertService()
+            repository: AdvertRepository(
+                service: AdvertService(),
+                mapper: AdvertMapper()
+            ),
+            viewDataFactory: AdvertDetailViewDataFactory()
         )
         let viewController = AdvertDetailViewController(
             presenter: presenter,

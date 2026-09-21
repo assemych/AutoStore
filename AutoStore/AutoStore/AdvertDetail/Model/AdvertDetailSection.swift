@@ -5,37 +5,32 @@
 //  Created by Assem Mukhamadi on 14.09.2026.
 //
 
-nonisolated
-struct AdvertDetailSection: Hashable {
-    let type: SectionType
-    let footerType: FooterType
-    let items: [ItemType]
-}
+import Foundation
 
-extension AdvertDetailSection {
-    nonisolated enum ItemType: Sendable, Hashable {
-        case galery(GalleryCellData)
+nonisolated struct AdvertDetailSection: Sendable, Hashable {
+    let id: ID
+    let footer: Footer?
+    let items: [AdvertDetailItem]
+
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+
+    nonisolated enum ID: Sendable, Hashable {
+        case gallery
         case title
-        case charecteristic
+        case characteristics
         case buyButton
         case reviews
         case recommendations
-        case dealers
+        case dealer
     }
-}
 
-extension AdvertDetailSection {
-    nonisolated enum SectionType: Sendable, Hashable {
-        case galery
-        case title
-        case charecteristic
-        case buyButton
-        case reviews
-        case recommendations
-        case dealers
-    }
-    
-    nonisolated enum FooterType: Hashable {
+    nonisolated enum Footer: Sendable {
         case gallery(GalleryPageControlViewData)
     }
 }

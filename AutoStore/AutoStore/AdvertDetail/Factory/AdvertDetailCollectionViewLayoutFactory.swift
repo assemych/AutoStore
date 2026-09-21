@@ -12,11 +12,32 @@ protocol AdvertDetailCollectionViewLayoutFactoryProtocol: AnyObject {
     func makeGallerySection(
         environment: NSCollectionLayoutEnvironment,
         onPageChanged: @escaping (Int) -> Void
-) -> NSCollectionLayoutSection
+    ) -> NSCollectionLayoutSection
+    func makeContentSection(estimatedHeight: CGFloat) -> NSCollectionLayoutSection
 }
 
 
 final class AdvertDetailCollectionViewLayoutFactory: AdvertDetailCollectionViewLayoutFactoryProtocol {
+    func makeContentSection(estimatedHeight: CGFloat) -> NSCollectionLayoutSection {
+        let item = NSCollectionLayoutItem(
+            layoutSize: .init(
+                widthDimension: .fractionalWidth(1),
+                heightDimension: .estimated(estimatedHeight)
+            )
+        )
+        let group = NSCollectionLayoutGroup.vertical(
+            layoutSize: .init(
+                widthDimension: .fractionalWidth(1),
+                heightDimension: .estimated(estimatedHeight)
+            ),
+            subitems: [item]
+        )
+        group.interItemSpacing = .fixed(8)
+        let section = NSCollectionLayoutSection(group: group)
+        section.contentInsets = .init(top: 6, leading: 0, bottom: 6, trailing: 0)
+        return section
+    }
+
     func makeGallerySection(
         environment: NSCollectionLayoutEnvironment,
         onPageChanged: @escaping (Int) -> Void

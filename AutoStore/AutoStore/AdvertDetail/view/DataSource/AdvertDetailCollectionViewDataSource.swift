@@ -1,134 +1,83 @@
-//
-//  AdvertDetailCollectionViewDataSource.swift
-//  AutoStore
-//
-//  Created by Assem Mukhamadi on 14.09.2026.
-//
-
-import Foundation
 import UIKit
 
-final class AdvertDetailCollectionViewDataSource: UICollectionViewDiffableDataSource<AdvertDetailSection, AdvertDetailSection.ItemType> {
-    typealias Snapshot = NSDiffableDataSourceSnapshot<AdvertDetailSection, AdvertDetailSection.ItemType>
-    
-    private weak var collectionView: UICollectionView?
-        
+@MainActor
+final class AdvertDetailCollectionViewDataSource: UICollectionViewDiffableDataSource<AdvertDetailSection, AdvertDetailItem> {
+    typealias Snapshot = NSDiffableDataSourceSnapshot<AdvertDetailSection, AdvertDetailItem>
+
     init(collectionView: UICollectionView) {
-        self.collectionView = collectionView
-        
         super.init(collectionView: collectionView) { collectionView, indexPath, item in
-            switch item {
-            case .galery(let cellData):
+            switch item.content {
+            case let .gallery(data):
                 let cell = collectionView.dequeueReusableCell(
                     withReuseIdentifier: "GalleryCell",
                     for: indexPath
                 ) as? GalleryCell
-                
-                cell?.configure(with: cellData)
+                cell?.configure(with: data)
                 
                 return cell
-            case .title:
-                return UICollectionViewCell()
-            case .charecteristic:
-                return UICollectionViewCell()
-            case .buyButton:
-                return UICollectionViewCell()
-            case .reviews:
-                return UICollectionViewCell()
-            case .recommendations:
-                return UICollectionViewCell()
-            case .dealers:
-                return UICollectionViewCell()
+            case let .text(data):
+                let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: "AdvertDetailTextCell",
+                    for: indexPath
+                ) as? AdvertDetailTextCell
+                cell?.configure(with: data)
+                
+                return cell
+            case let .buyButton(data):
+                let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: "AdvertDetailButtonCell",
+                    for: indexPath
+                ) as? AdvertDetailButtonCell
+                cell?.configure(with: data)
+                
+                return cell
             }
-            
         }
-        
-        registerCells(collectionView: collectionView)
-        registerSupplementaryViews(collectionView: collectionView)
+
+        collectionView.register(GalleryCell.self, forCellWithReuseIdentifier: "GalleryCell")
+        collectionView.register(AdvertDetailTextCell.self, forCellWithReuseIdentifier: "AdvertDetailTextCell")
+        collectionView.register(AdvertDetailButtonCell.self, forCellWithReuseIdentifier: "AdvertDetailButtonCell")
+        collectionView.register(
+            GalleryPageControlView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
+            withReuseIdentifier: "GalleryPageControlView"
+        )
     }
-    
+
     override func collectionView(
         _ collectionView: UICollectionView,
         viewForSupplementaryElementOfKind kind: String,
         at indexPath: IndexPath
     ) -> UICollectionReusableView {
         guard kind == UICollectionView.elementKindSectionFooter,
-              let section = sectionIdentifier(for: indexPath.section) else {
-            preconditionFailure("Unsupported supplementary view or missing section")
-        }
-        
-        switch section.footerType {
-        case let .gallery(viewData):
-            guard let galleryView = collectionView.dequeueReusableSupplementaryView(
+              let section = sectionIdentifier(for: indexPath.section),
+              case let .gallery(viewData)? = section.footer,
+              let galleryView = collectionView.dequeueReusableSupplementaryView(
                 ofKind: kind,
                 withReuseIdentifier: "GalleryPageControlView",
                 for: indexPath
-            ) as? GalleryPageControlView else {
-                preconditionFailure("Failed to dequeue GalleryPageControlView")
-            }
-            
-            galleryView.configure(with: viewData)
-            
-            return galleryView
+              ) as? GalleryPageControlView else {
+            preconditionFailure("Invalid gallery footer configuration")
         }
+
+        galleryView.configure(with: viewData)
+        
+        return galleryView
     }
-    
+
     func update(with viewData: AdvertDetailViewData) {
         let sections = viewData.sections
-        
-        var snapshot = Snapshot()
-        snapshot.appendSections(sections.map { $0 })
+
+        var newSnapshot = Snapshot()
+        newSnapshot.appendSections(sections)
         sections.forEach { section in
-            snapshot.appendItems(section.items, toSection: section)
-        }
-        apply(snapshot, animatingDifferences: true)
-    }
-    
-    func numberOfGalleryItems() -> Int {
-        let snapshot = snapshot()
-
-        guard let gallerySection = snapshot.sectionIdentifiers.first(where: { $0.type == .galery }) else {
-            return 0
+            newSnapshot.appendItems(section.items, toSection: section)
         }
 
-        return snapshot.numberOfItems(inSection: gallerySection)
+        apply(newSnapshot, animatingDifferences: false)
     }
-    
-    func updateGalleryPage(_ page: Int) {
-        let snapshot = snapshot()
-        
-        guard let gallerySection = snapshot.sectionIdentifiers.first(where: { $0.type == .galery }),
-              let sectionIndex = snapshot.indexOfSection(gallerySection) else {
-            return
-        }
-        
-        let pagesCount = snapshot.numberOfItems(inSection: gallerySection)
-        
-        guard pagesCount > 0 else { return }
-        
-        let validPage = min(max(page, 0), pagesCount - 1)
-        let indexPath = IndexPath(item: 0, section: sectionIndex)
-        
-        guard let galleryView = collectionView?.supplementaryView(
-            forElementKind: UICollectionView.elementKindSectionFooter,
-            at: indexPath
-        ) as? GalleryPageControlView else {
-            return
-        }
-        
-        galleryView.setCurrentPage(validPage)
-    }
-}
 
-private extension AdvertDetailCollectionViewDataSource {
-    private func registerCells(collectionView: UICollectionView) {
-        collectionView.register(GalleryCell.self, forCellWithReuseIdentifier: "GalleryCell")
-    }
-    private func registerSupplementaryViews(collectionView: UICollectionView) {
-        collectionView.register(
-            GalleryPageControlView.self,
-            forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
-            withReuseIdentifier: "GalleryPageControlView"
-        )
+    func clear() {
+        apply(Snapshot(), animatingDifferences: false)
     }
 }
