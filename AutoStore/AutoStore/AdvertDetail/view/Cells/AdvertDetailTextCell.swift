@@ -44,6 +44,9 @@ final class AdvertDetailTextCell: UICollectionViewCell {
         case .characteristic:
             titleLabel.font = .preferredFont(forTextStyle: .headline)
             titleLabel.textColor = .label
+        case .rating:
+            titleLabel.font = .preferredFont(forTextStyle: .title2)
+            titleLabel.textColor = .label
         case .review, .recommendation, .dealer:
             titleLabel.font = .preferredFont(forTextStyle: .headline)
             titleLabel.textColor = .label

@@ -13,6 +13,7 @@ import SnapKit
 protocol AdvertDetailViewInputProtocol: AnyObject {
     func render(state: AdvertDetailViewState)
     func showPurchaseError(message: String)
+    func showReviewsError(message: String)
 }
 
 final class AdvertDetailViewController: UIViewController, AdvertDetailViewInputProtocol {
@@ -106,6 +107,14 @@ final class AdvertDetailViewController: UIViewController, AdvertDetailViewInputP
     }
 
     func showPurchaseError(message: String) {
+        showError(message: message)
+    }
+
+    func showReviewsError(message: String) {
+        showError(message: message)
+    }
+
+    private func showError(message: String) {
         let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
@@ -182,10 +191,17 @@ private extension AdvertDetailViewController {
 extension AdvertDetailViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let section = collectionViewDataSource.sectionIdentifier(for: indexPath.section),
-              section.id == .buyButton else {
+              let item = collectionViewDataSource.itemIdentifier(for: indexPath) else {
             return
         }
 
-        presenter.buyButtonTapped()
+        switch (section.id, item.content) {
+        case (.buyButton, .buyButton):
+            presenter.buyButtonTapped()
+        case (.reviews, .reviewsLoadMore):
+            presenter.reviewsLoadMoreTapped()
+        default:
+            break
+        }
     }
 }

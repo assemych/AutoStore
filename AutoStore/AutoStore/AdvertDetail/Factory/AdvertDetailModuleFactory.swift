@@ -23,6 +23,7 @@ enum AdvertDetailModuleFactory {
                 idGeneratorService: PaymentIDGeneratorService(),
                 paymentDataService: PaymentDataService()
             ),
+            reviewsRepository: ReviewsRepository(service: ReviewsService()),
             viewDataFactory: AdvertDetailViewDataFactory()
         )
         let viewController = AdvertDetailViewController(

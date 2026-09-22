@@ -11,6 +11,7 @@ nonisolated struct AdvertDetailTextCellData: Sendable, Equatable {
     nonisolated enum Style: Sendable, Hashable {
         case title
         case characteristic
+        case rating
         case review
         case recommendation
         case dealer

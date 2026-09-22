@@ -31,6 +31,14 @@ final class AdvertDetailCollectionViewDataSource: UICollectionViewDiffableDataSo
                 cell?.configure(with: data)
                 
                 return cell
+            case let .reviewsLoadMore(data):
+                let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: "AdvertDetailButtonCell",
+                    for: indexPath
+                ) as? AdvertDetailButtonCell
+                cell?.configure(with: data)
+
+                return cell
             }
         }
 
