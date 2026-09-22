@@ -66,6 +66,9 @@ final class AdvertDetailCollectionViewDataSource: UICollectionViewDiffableDataSo
     }
 
     func update(with viewData: AdvertDetailViewData) {
+        let previousItemsByID = Dictionary(
+            uniqueKeysWithValues: snapshot().itemIdentifiers.map { ($0.id, $0) }
+        )
         let sections = viewData.sections
 
         var newSnapshot = Snapshot()
@@ -74,10 +77,22 @@ final class AdvertDetailCollectionViewDataSource: UICollectionViewDiffableDataSo
             newSnapshot.appendItems(section.items, toSection: section)
         }
 
-        apply(newSnapshot, animatingDifferences: false)
+        let changedItems = sections
+            .flatMap(\.items)
+            .filter { newItem in
+                guard let previousItem = previousItemsByID[newItem.id] else {
+                    return false
+                }
+
+                return previousItem.content != newItem.content
+            }
+        newSnapshot.reconfigureItems(changedItems)
+
+        apply(newSnapshot, animatingDifferences: !previousItemsByID.isEmpty)
     }
 
     func clear() {
         apply(Snapshot(), animatingDifferences: false)
     }
+
 }

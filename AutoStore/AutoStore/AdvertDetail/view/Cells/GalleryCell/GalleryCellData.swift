@@ -7,6 +7,6 @@
 
 import Foundation
 
-nonisolated struct GalleryCellData: Sendable {
+nonisolated struct GalleryCellData: Sendable, Equatable {
     let imageURL: URL
 }

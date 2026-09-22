@@ -7,7 +7,7 @@
 
 import Foundation
 
-nonisolated struct AdvertDetailTextCellData: Sendable {
+nonisolated struct AdvertDetailTextCellData: Sendable, Equatable {
     nonisolated enum Style: Sendable, Hashable {
         case title
         case characteristic

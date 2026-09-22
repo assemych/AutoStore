@@ -19,7 +19,7 @@ nonisolated struct AdvertDetailItem: Sendable, Hashable {
         hasher.combine(id)
     }
 
-    nonisolated enum Content: Sendable {
+    nonisolated enum Content: Sendable, Equatable {
         case gallery(GalleryCellData)
         case text(AdvertDetailTextCellData)
         case buyButton(AdvertDetailButtonCellData)

@@ -58,7 +58,25 @@ private extension TabBarController {
             return
         }
 
-        let viewController = AdvertDetailModuleFactory.make(advertID: id)
+        let viewController = AdvertDetailModuleFactory.make(advertID: id) { [weak self] action in
+            self?.handle(action)
+        }
+        navigationController.pushViewController(viewController, animated: true)
+    }
+
+    private func handle(_ action: AdvertDetailOutputAction) {
+        switch action {
+        case let .showPayment(payment):
+            openPayment(payment)
+        }
+    }
+
+    private func openPayment(_ payment: PaymentModel) {
+        guard let navigationController = selectedViewController as? UINavigationController else {
+            return
+        }
+
+        let viewController = PaymentModuleFactory.make(payment: payment)
         navigationController.pushViewController(viewController, animated: true)
     }
 }

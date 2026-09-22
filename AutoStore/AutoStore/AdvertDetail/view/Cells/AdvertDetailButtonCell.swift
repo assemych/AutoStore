@@ -8,8 +8,9 @@
 import UIKit
 import SnapKit
 
-nonisolated struct AdvertDetailButtonCellData: Sendable {
+nonisolated struct AdvertDetailButtonCellData: Sendable, Equatable {
     let title: String
+    let isLoading: Bool
 }
 
 final class AdvertDetailButtonCell: UICollectionViewCell {
@@ -35,5 +36,7 @@ final class AdvertDetailButtonCell: UICollectionViewCell {
 
     func configure(with data: AdvertDetailButtonCellData) {
         button.configuration?.title = data.title
+        button.configuration?.showsActivityIndicator = data.isLoading
+        isUserInteractionEnabled = !data.isLoading
     }
 }
