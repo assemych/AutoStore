@@ -20,10 +20,7 @@ final class AdvertDetailPresenter: AdvertDetailOutputProtocol {
     var output: AdvertDetailOutput?
 
     private let advertID: Int
-    private let repository: AdvertRepositoryProtocol
-    private let paymentRepository: PaymentRepositoryProtocol
-    private let reviewsRepository: ReviewsRepositoryProtocol
-    private let recommendationsRepository: RecommendationsRepositoryProtocol
+    private let repository: AdvertDetailRepositoryProtocol
     private let viewDataFactory: AdvertDetailViewDataFactoryProtocol
     private var loadTask: Task<Void, Never>?
     private var paymentTask: Task<Void, Never>?
@@ -36,17 +33,11 @@ final class AdvertDetailPresenter: AdvertDetailOutputProtocol {
 
     init(
         advertID: Int,
-        repository: AdvertRepositoryProtocol,
-        paymentRepository: PaymentRepositoryProtocol,
-        reviewsRepository: ReviewsRepositoryProtocol,
-        recommendationsRepository: RecommendationsRepositoryProtocol,
+        repository: AdvertDetailRepositoryProtocol,
         viewDataFactory: AdvertDetailViewDataFactoryProtocol
     ) {
         self.advertID = advertID
         self.repository = repository
-        self.paymentRepository = paymentRepository
-        self.reviewsRepository = reviewsRepository
-        self.recommendationsRepository = recommendationsRepository
         self.viewDataFactory = viewDataFactory
     }
 
@@ -79,7 +70,7 @@ final class AdvertDetailPresenter: AdvertDetailOutputProtocol {
             }
 
             do {
-                let payment = try await paymentRepository.preparePayment(advertId: advertID)
+                let payment = try await repository.preparePayment(advertId: advertID)
                 try Task.checkCancellation()
                 output?(.showPayment(payment))
             } catch is CancellationError {
@@ -101,7 +92,7 @@ final class AdvertDetailPresenter: AdvertDetailOutputProtocol {
             defer { reviewsTask = nil }
 
             do {
-                let page = try await reviewsRepository.fetchReviews(
+                let page = try await repository.fetchReviews(
                     advertId: advertID,
                     page: nextPage,
                     pageSize: reviewsPageSize
@@ -130,12 +121,12 @@ final class AdvertDetailPresenter: AdvertDetailOutputProtocol {
 
             do {
                 async let advertRequest = repository.fetchAdvert(id: advertID)
-                async let reviewsRequest = reviewsRepository.fetchReviews(
+                async let reviewsRequest = repository.fetchReviews(
                     advertId: advertID,
                     page: 1,
                     pageSize: reviewsPageSize
                 )
-                async let recommendationsRequest = recommendationsRepository.fetchRecommendations(
+                async let recommendationsRequest = repository.fetchRecommendations(
                     advertId: advertID
                 )
                 let (advertModel, reviewsPage, recommendations) = try await (

@@ -15,17 +15,17 @@ enum AdvertDetailModuleFactory {
     ) -> UIViewController {
         let presenter = AdvertDetailPresenter(
             advertID: advertID,
-            repository: AdvertRepository(
-                service: AdvertService(),
-                mapper: AdvertMapper()
-            ),
-            paymentRepository: PaymentRepository(
-                idGeneratorService: PaymentIDGeneratorService(),
-                paymentDataService: PaymentDataService()
-            ),
-            reviewsRepository: ReviewsRepository(service: ReviewsService()),
-            recommendationsRepository: RecommendationsRepository(
-                service: RecommendationsService()
+            repository: AdvertDetailRepository(
+                paymentRepository: PaymentRepository(
+                    idGeneratorService: PaymentIDGeneratorService(),
+                    paymentDataService: PaymentDataService()
+                ),
+                advertRepository: AdvertRepository(
+                    service: AdvertService(),
+                    mapper: AdvertMapper()
+                ),
+                reviewsService: ReviewsService(),
+                recommendationsService: RecommendationsService()
             ),
             viewDataFactory: AdvertDetailViewDataFactory()
         )
