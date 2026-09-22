@@ -1,0 +1,8 @@
+# Xcode per-user state
+xcuserdata/
+*.xcuserstate
+
+# Local build artifacts
+DerivedData/
+.build/
+

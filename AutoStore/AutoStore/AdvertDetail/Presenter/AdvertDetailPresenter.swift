@@ -1,0 +1,187 @@
+import Foundation
+
+typealias AdvertDetailOutput = (AdvertDetailOutputAction) -> Void
+
+@MainActor
+protocol AdvertDetailOutputProtocol: AnyObject {
+    var view: AdvertDetailViewInputProtocol? { get set }
+
+    func viewDidLoad()
+    func retry()
+    func viewDidDisappear()
+    func buyButtonTapped()
+    func reviewsLoadMoreTapped()
+    func recommendationTapped(advertID: Int)
+}
+
+@MainActor
+final class AdvertDetailPresenter: AdvertDetailOutputProtocol {
+    weak var view: AdvertDetailViewInputProtocol?
+    var output: AdvertDetailOutput?
+
+    private let advertID: Int
+    private let repository: AdvertDetailRepositoryProtocol
+    private let viewDataFactory: AdvertDetailViewDataFactoryProtocol
+    private var loadTask: Task<Void, Never>?
+    private var paymentTask: Task<Void, Never>?
+    private var reviewsTask: Task<Void, Never>?
+    private var viewData: AdvertDetailViewData?
+    private var currentReviewsPage = 1
+    private var hasNextReviewsPage = false
+
+    private let reviewsPageSize = 3
+
+    init(
+        advertID: Int,
+        repository: AdvertDetailRepositoryProtocol,
+        viewDataFactory: AdvertDetailViewDataFactoryProtocol
+    ) {
+        self.advertID = advertID
+        self.repository = repository
+        self.viewDataFactory = viewDataFactory
+    }
+
+    func viewDidLoad() {
+        loadAdvert()
+    }
+
+    func retry() {
+        loadAdvert()
+    }
+
+    func viewDidDisappear() {
+        loadTask?.cancel()
+        loadTask = nil
+        paymentTask?.cancel()
+        paymentTask = nil
+        reviewsTask?.cancel()
+        reviewsTask = nil
+    }
+
+    func buyButtonTapped() {
+        guard paymentTask == nil else { return }
+
+        updatePaymentState(isLoading: true)
+        paymentTask = Task { [weak self] in
+            guard let self else { return }
+            defer {
+                paymentTask = nil
+                updatePaymentState(isLoading: false)
+            }
+
+            do {
+                let payment = try await repository.preparePayment(advertId: advertID)
+                try Task.checkCancellation()
+                output?(.showPayment(payment))
+            } catch is CancellationError {
+                return
+            } catch {
+                view?.showPurchaseError(message: "Не удалось подготовить платёж")
+            }
+        }
+    }
+
+    func reviewsLoadMoreTapped() {
+        guard reviewsTask == nil, hasNextReviewsPage else { return }
+
+        updateReviewsLoading(isLoading: true)
+        let nextPage = currentReviewsPage + 1
+        
+        reviewsTask = Task { [weak self] in
+            guard let self else { return }
+            defer { reviewsTask = nil }
+
+            do {
+                let page = try await repository.fetchReviews(
+                    advertId: advertID,
+                    page: nextPage,
+                    pageSize: reviewsPageSize
+                )
+                try Task.checkCancellation()
+                appendReviews(page)
+            } catch is CancellationError {
+                return
+            } catch {
+                updateReviewsLoading(isLoading: false)
+                view?.showReviewsError(message: "Не удалось загрузить отзывы")
+            }
+        }
+    }
+
+    func recommendationTapped(advertID: Int) {
+        output?(.showAdvert(id: advertID))
+    }
+
+    private func loadAdvert() {
+        loadTask?.cancel()
+        view?.render(state: .loading)
+
+        loadTask = Task { [weak self] in
+            guard let self else { return }
+
+            do {
+                async let advertRequest = repository.fetchAdvert(id: advertID)
+                async let reviewsRequest = repository.fetchReviews(
+                    advertId: advertID,
+                    page: 1,
+                    pageSize: reviewsPageSize
+                )
+                async let recommendationsRequest = repository.fetchRecommendations(
+                    advertId: advertID
+                )
+                let (advertModel, reviewsPage, recommendations) = try await (
+                    advertRequest,
+                    reviewsRequest,
+                    recommendationsRequest
+                )
+                try Task.checkCancellation()
+                currentReviewsPage = reviewsPage.page
+                hasNextReviewsPage = reviewsPage.hasNextPage
+                let viewData = viewDataFactory.makeViewData(
+                    from: advertModel,
+                    reviewsPage: reviewsPage,
+                    recommendations: recommendations
+                )
+                self.viewData = viewData
+                view?.render(state: .content(viewData))
+            } catch is CancellationError {
+                return
+            } catch {
+                view?.render(state: .error(message: "Не удалось загрузить объявление"))
+            }
+        }
+    }
+
+    private func updatePaymentState(isLoading: Bool) {
+        guard let viewData else { return }
+
+        let updatedViewData = viewDataFactory.updatingPaymentState(
+            in: viewData,
+            isLoading: isLoading
+        )
+        self.viewData = updatedViewData
+        view?.render(state: .content(updatedViewData))
+    }
+
+    private func updateReviewsLoading(isLoading: Bool) {
+        guard let viewData else { return }
+
+        let updatedViewData = viewDataFactory.updatingReviewsLoading(
+            in: viewData,
+            isLoading: isLoading
+        )
+        self.viewData = updatedViewData
+        view?.render(state: .content(updatedViewData))
+    }
+
+    private func appendReviews(_ page: ReviewsPageModel) {
+        guard let viewData else { return }
+
+        currentReviewsPage = page.page
+        hasNextReviewsPage = page.hasNextPage
+        let updatedViewData = viewDataFactory.appendingReviews(to: viewData, page: page)
+        self.viewData = updatedViewData
+        
+        view?.render(state: .content(updatedViewData))
+    }
+}
