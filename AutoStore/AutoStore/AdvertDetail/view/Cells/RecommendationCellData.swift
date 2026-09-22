@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct RecommendationCellData: Sendable, Equatable {
+nonisolated struct RecommendationCellData: Sendable, Equatable {
     let advertID: Int
     let title: String
     let price: String

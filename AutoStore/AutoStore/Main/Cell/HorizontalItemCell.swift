@@ -91,10 +91,8 @@ private extension HorizontalItemCell {
         }
         imageView.snp.makeConstraints { make in
             make.leading.top.trailing.equalToSuperview()
-            make.height.equalTo(122)
-            make.width.equalTo(204)
+            make.height.equalTo(100)
         }
-        label.setContentHuggingPriority(.defaultLow, for: .horizontal)
         label.snp.makeConstraints { make in
             make.top.equalTo(imageView.snp.bottom).offset(4)
             make.trailing.leading.bottom.equalToSuperview()

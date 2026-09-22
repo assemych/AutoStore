@@ -134,11 +134,17 @@ private extension MainViewController {
             switch section.type {
             case .horizontalList:
                 let item = NSCollectionLayoutItem(
-                    layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1))
+                    layoutSize: .init(
+                        widthDimension: .fractionalWidth(1),
+                        heightDimension: .estimated(148)
+                    )
                 )
                 item.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
                 let containerGroup = NSCollectionLayoutGroup.horizontal(
-                    layoutSize: .init(widthDimension: .fractionalWidth(0.8), heightDimension: .fractionalHeight(0.2)),
+                    layoutSize: .init(
+                        widthDimension: .fractionalWidth(0.8),
+                        heightDimension: .estimated(168)
+                    ),
                     subitems: [item]
                 )
                 let section = NSCollectionLayoutSection(group: containerGroup)
