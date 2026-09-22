@@ -1,12 +1,6 @@
 import Foundation
 
 struct AdvertResponse: Sendable {
-    struct Recommendation: Sendable {
-        let id: Int
-        let title: String
-        let price: String
-    }
-
     let id: Int
     let brand: String
     let model: String
@@ -17,7 +11,6 @@ struct AdvertResponse: Sendable {
     let dealerName: String
     let dealerAddress: String
     let imageURLs: [URL]
-    let recommendations: [Recommendation]
 }
 
 extension AdvertResponse {
@@ -35,10 +28,6 @@ extension AdvertResponse {
             URL(string: "https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb")!,
             URL(string: "https://images.unsplash.com/photo-1619767886558-efdc259cde1a")!,
             URL(string: "https://images.unsplash.com/photo-1550355291-bbee04a92027")!
-        ],
-        recommendations: [
-            .init(id: 201, title: "Toyota Camry 2.0", price: "16 500 000 ₸"),
-            .init(id: 202, title: "Toyota RAV4", price: "21 300 000 ₸")
         ]
     )
 }

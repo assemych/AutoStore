@@ -14,10 +14,32 @@ protocol AdvertDetailCollectionViewLayoutFactoryProtocol: AnyObject {
         onPageChanged: @escaping (Int) -> Void
     ) -> NSCollectionLayoutSection
     func makeContentSection(estimatedHeight: CGFloat) -> NSCollectionLayoutSection
+    func makeRecommendationsSection() -> NSCollectionLayoutSection
 }
 
 
 final class AdvertDetailCollectionViewLayoutFactory: AdvertDetailCollectionViewLayoutFactoryProtocol {
+    func makeRecommendationsSection() -> NSCollectionLayoutSection {
+        let item = NSCollectionLayoutItem(
+            layoutSize: .init(
+                widthDimension: .fractionalWidth(1),
+                heightDimension: .fractionalHeight(1)
+            )
+        )
+        let group = NSCollectionLayoutGroup.horizontal(
+            layoutSize: .init(
+                widthDimension: .absolute(190),
+                heightDimension: .estimated(190)
+            ),
+            subitems: [item]
+        )
+        let section = NSCollectionLayoutSection(group: group)
+        section.orthogonalScrollingBehavior = .continuous
+        section.interGroupSpacing = 8
+        section.contentInsets = .init(top: 6, leading: 0, bottom: 6, trailing: 0)
+        return section
+    }
+
     func makeContentSection(estimatedHeight: CGFloat) -> NSCollectionLayoutSection {
         let item = NSCollectionLayoutItem(
             layoutSize: .init(

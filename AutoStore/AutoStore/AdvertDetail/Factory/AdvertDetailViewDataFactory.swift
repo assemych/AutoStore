@@ -1,14 +1,22 @@
 import Foundation
 
 protocol AdvertDetailViewDataFactoryProtocol: AnyObject {
-    func makeViewData(from advert: AdvertModel, reviewsPage: ReviewsPageModel) -> AdvertDetailViewData
+    func makeViewData(
+        from advert: AdvertModel,
+        reviewsPage: ReviewsPageModel,
+        recommendations: [RecommendationModel]
+    ) -> AdvertDetailViewData
     func updatingPaymentState(in viewData: AdvertDetailViewData, isLoading: Bool) -> AdvertDetailViewData
     func updatingReviewsLoading(in viewData: AdvertDetailViewData, isLoading: Bool) -> AdvertDetailViewData
     func appendingReviews(to viewData: AdvertDetailViewData, page: ReviewsPageModel) -> AdvertDetailViewData
 }
 
 final class AdvertDetailViewDataFactory: AdvertDetailViewDataFactoryProtocol {
-    func makeViewData(from advert: AdvertModel, reviewsPage: ReviewsPageModel) -> AdvertDetailViewData {
+    func makeViewData(
+        from advert: AdvertModel,
+        reviewsPage: ReviewsPageModel,
+        recommendations: [RecommendationModel]
+    ) -> AdvertDetailViewData {
         var sections: [AdvertDetailSection] = []
 
         if !advert.imageURLs.isEmpty {
@@ -54,15 +62,16 @@ final class AdvertDetailViewDataFactory: AdvertDetailViewDataFactoryProtocol {
 
         sections.append(makeReviewsSection(from: reviewsPage))
 
-        if !advert.recommendations.isEmpty {
+        if !recommendations.isEmpty {
             sections.append(.init(
                 id: .recommendations,
                 footer: nil,
-                items: advert.recommendations.map { recommendation in
-                    item(content: .text(.init(
+                items: recommendations.map { recommendation in
+                    item(content: .recommendation(.init(
+                        advertID: recommendation.advertID,
                         title: recommendation.title,
-                        subtitle: recommendation.price,
-                        style: .recommendation
+                        price: recommendation.price,
+                        imageURL: recommendation.imageURL
                     )))
                 }
             ))

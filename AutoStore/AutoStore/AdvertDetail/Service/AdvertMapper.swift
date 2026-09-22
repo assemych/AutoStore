@@ -13,10 +13,7 @@ final class AdvertMapper: AdvertMapperProtocol {
             transmission: response.transmission,
             dealerName: response.dealerName,
             dealerAddress: response.dealerAddress,
-            imageURLs: response.imageURLs,
-            recommendations: response.recommendations.map {
-                .init(id: $0.id, title: $0.title, price: $0.price)
-            }
+            imageURLs: response.imageURLs
         )
     }
 }

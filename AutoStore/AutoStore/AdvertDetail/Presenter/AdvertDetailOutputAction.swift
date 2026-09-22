@@ -9,4 +9,5 @@ import Foundation
 
 enum AdvertDetailOutputAction {
     case showPayment(PaymentModel)
+    case showAdvert(id: Int)
 }

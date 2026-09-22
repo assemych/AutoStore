@@ -11,6 +11,7 @@ protocol AdvertDetailOutputProtocol: AnyObject {
     func viewDidDisappear()
     func buyButtonTapped()
     func reviewsLoadMoreTapped()
+    func recommendationTapped(advertID: Int)
 }
 
 @MainActor
@@ -22,6 +23,7 @@ final class AdvertDetailPresenter: AdvertDetailOutputProtocol {
     private let repository: AdvertRepositoryProtocol
     private let paymentRepository: PaymentRepositoryProtocol
     private let reviewsRepository: ReviewsRepositoryProtocol
+    private let recommendationsRepository: RecommendationsRepositoryProtocol
     private let viewDataFactory: AdvertDetailViewDataFactoryProtocol
     private var loadTask: Task<Void, Never>?
     private var paymentTask: Task<Void, Never>?
@@ -37,12 +39,14 @@ final class AdvertDetailPresenter: AdvertDetailOutputProtocol {
         repository: AdvertRepositoryProtocol,
         paymentRepository: PaymentRepositoryProtocol,
         reviewsRepository: ReviewsRepositoryProtocol,
+        recommendationsRepository: RecommendationsRepositoryProtocol,
         viewDataFactory: AdvertDetailViewDataFactoryProtocol
     ) {
         self.advertID = advertID
         self.repository = repository
         self.paymentRepository = paymentRepository
         self.reviewsRepository = reviewsRepository
+        self.recommendationsRepository = recommendationsRepository
         self.viewDataFactory = viewDataFactory
     }
 
@@ -113,6 +117,10 @@ final class AdvertDetailPresenter: AdvertDetailOutputProtocol {
         }
     }
 
+    func recommendationTapped(advertID: Int) {
+        output?(.showAdvert(id: advertID))
+    }
+
     private func loadAdvert() {
         loadTask?.cancel()
         view?.render(state: .loading)
@@ -127,13 +135,21 @@ final class AdvertDetailPresenter: AdvertDetailOutputProtocol {
                     page: 1,
                     pageSize: reviewsPageSize
                 )
-                let (advertModel, reviewsPage) = try await (advertRequest, reviewsRequest)
+                async let recommendationsRequest = recommendationsRepository.fetchRecommendations(
+                    advertId: advertID
+                )
+                let (advertModel, reviewsPage, recommendations) = try await (
+                    advertRequest,
+                    reviewsRequest,
+                    recommendationsRequest
+                )
                 try Task.checkCancellation()
                 currentReviewsPage = reviewsPage.page
                 hasNextReviewsPage = reviewsPage.hasNextPage
                 let viewData = viewDataFactory.makeViewData(
                     from: advertModel,
-                    reviewsPage: reviewsPage
+                    reviewsPage: reviewsPage,
+                    recommendations: recommendations
                 )
                 self.viewData = viewData
                 view?.render(state: .content(viewData))

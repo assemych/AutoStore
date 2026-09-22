@@ -24,5 +24,6 @@ nonisolated struct AdvertDetailItem: Sendable, Hashable {
         case text(AdvertDetailTextCellData)
         case buyButton(AdvertDetailButtonCellData)
         case reviewsLoadMore(AdvertDetailButtonCellData)
+        case recommendation(RecommendationCellData)
     }
 }

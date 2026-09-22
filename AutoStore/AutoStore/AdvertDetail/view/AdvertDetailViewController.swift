@@ -175,7 +175,7 @@ private extension AdvertDetailViewController {
             case .reviews:
                 return self?.collectionViewFactory.makeContentSection(estimatedHeight: 88)
             case .recommendations:
-                return self?.collectionViewFactory.makeContentSection(estimatedHeight: 80)
+                return self?.collectionViewFactory.makeRecommendationsSection()
             case .dealer:
                 return self?.collectionViewFactory.makeContentSection(estimatedHeight: 80)
             }
@@ -200,6 +200,8 @@ extension AdvertDetailViewController: UICollectionViewDelegate {
             presenter.buyButtonTapped()
         case (.reviews, .reviewsLoadMore):
             presenter.reviewsLoadMoreTapped()
+        case let (.recommendations, .recommendation(data)):
+            presenter.recommendationTapped(advertID: data.advertID)
         default:
             break
         }

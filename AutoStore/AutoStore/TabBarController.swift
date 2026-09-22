@@ -68,6 +68,8 @@ private extension TabBarController {
         switch action {
         case let .showPayment(payment):
             openPayment(payment)
+        case let .showAdvert(id):
+            openAdvertDetail(id: id)
         }
     }
 

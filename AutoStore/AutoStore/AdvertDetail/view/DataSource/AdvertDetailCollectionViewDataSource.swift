@@ -39,12 +39,21 @@ final class AdvertDetailCollectionViewDataSource: UICollectionViewDiffableDataSo
                 cell?.configure(with: data)
 
                 return cell
+            case let .recommendation(data):
+                let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: "RecommendationCell",
+                    for: indexPath
+                ) as? RecommendationCell
+                cell?.configure(with: data)
+
+                return cell
             }
         }
 
         collectionView.register(GalleryCell.self, forCellWithReuseIdentifier: "GalleryCell")
         collectionView.register(AdvertDetailTextCell.self, forCellWithReuseIdentifier: "AdvertDetailTextCell")
         collectionView.register(AdvertDetailButtonCell.self, forCellWithReuseIdentifier: "AdvertDetailButtonCell")
+        collectionView.register(RecommendationCell.self, forCellWithReuseIdentifier: "RecommendationCell")
         collectionView.register(
             GalleryPageControlView.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
